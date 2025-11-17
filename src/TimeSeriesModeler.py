@@ -6,7 +6,7 @@ import pandas as pd
 
 from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.arima.model import ARIMA
-from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.metrics import mean_absolute_error, root_mean_squared_error
 
 class TimeSeriesModeler:
     """
@@ -42,7 +42,7 @@ class TimeSeriesModeler:
 
         forecast_test = model_fit.forecast(steps=len(test))
         mae = mean_absolute_error(test, forecast_test)
-        rmse = mean_squared_error(test, forecast_test, squared=False)
+        rmse = root_mean_squared_error(test, forecast_test)
 
         self.fitted_model = ARIMA(series, order=order).fit()
         future_forecast = self.fitted_model.forecast(steps=steps)

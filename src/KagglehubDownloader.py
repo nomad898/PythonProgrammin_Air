@@ -13,17 +13,8 @@ class KagglehubDownloader:
         This does NOT show real bytes downloaded, but gives the user feedback.
         """
         print(f"Preparing to download dataset: {dataset_name}")
-
-        # Simple pseudo-progress before real call
-        stages = ["Initializing", "Connecting to Kaggle", "Starting download"]
-        for stage in stages:
-            sys.stdout.write(f"\r{stage}... ")
-            sys.stdout.flush()
-            time.sleep(0.5)
-
-        # Real download call
         path = kagglehub.dataset_download(dataset_name)
 
-        sys.stdout.write("\rDownload complete.                  \n")
+        print("Download complete.")
         print("Path to dataset files:", path)
         return path

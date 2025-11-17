@@ -31,7 +31,6 @@ class AirQualityDataManager:
         if not os.path.exists(csv_path):
             raise FileNotFoundError(f"CSV file not found at {csv_path}")
 
-        # You can also copy/move this file into data/raw if you want
         self.raw_path = csv_path
         return csv_path
 
@@ -42,12 +41,18 @@ class AirQualityDataManager:
         if not os.path.exists(self.raw_path):
             self.download_dataset()
 
-        df = pd.read_csv(self.raw_path, sep=";", decimal=",")
+        df = pd.read_csv(self.raw_path, sep=";", decimal=",", na_values=[-200])
         df = df.dropna(axis=1, how="all")
         df = df.replace(-200, pd.NA)
 
+        df["Date"] = df["Date"].astype(str).str.strip()
+        df["Time"] = df["Time"].astype(str).str.strip()
+        df["Time"] = df["Time"].str.replace(".", ":", regex=False)
+        df["Time"] = df["Time"].str.replace("24:00:00", "23:59:59")
         df["Datetime"] = pd.to_datetime(
-            df["Date"] + " " + df["Time"], dayfirst=True, errors="coerce"
+            df["Date"] + " " + df["Time"],
+            format="%d/%m/%Y %H:%M:%S",
+            errors="coerce"
         )
         df = df.dropna(subset=["Datetime"])
         df = df.set_index("Datetime").sort_index()

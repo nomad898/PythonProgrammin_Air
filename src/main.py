@@ -1,5 +1,5 @@
 from typing import Dict
-from cli_app import action_arima_forecast, action_compare_ml, action_corr_heatmap, action_load_info, action_lr_forecast, action_run_eda, action_trend_boxplot, print_menu
+from cli_app import action_arima_forecast, action_compare_ml, action_compare_ml_multivar, action_corr_heatmap, action_load_info, action_lr_forecast, action_run_eda, action_trend_boxplot, print_menu
 from utils import ensure_dir
 
 
@@ -31,6 +31,8 @@ def main() -> None:
             action_compare_ml(state)
         elif choice == "7":
             action_lr_forecast(state)
+        elif choice == "8":
+            action_compare_ml_multivar(state)
         else:
             print("Invalid choice, try again.")
 

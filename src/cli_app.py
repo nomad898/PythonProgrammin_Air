@@ -5,7 +5,7 @@ import pandas as pd
 from arima_forecast import arima_forecast_with_backtest, plot_history_and_forecast, save_model_metrics
 from data_loading import get_daily_aggregates, load_raw
 from linear_regression_forecast import forecast_linear_regression, train_linear_regression
-from ml_models import compare_ml_models
+from ml_models import compare_ml_models, compare_ml_models_multivar
 from eda import save_eda_summary
 from utils import get_default_paths
 from visualization import plot_boxplot_by_month, plot_corr_heatmap, plot_trend_line
@@ -22,6 +22,7 @@ def print_menu() -> None:
     print("5 - ARIMA forecast with backtest")
     print("6 - Compare ML models on time series")
     print("7 - Linear Regression forecast only")
+    print("8 - Compare multivar ML models on time series")
     print("0 - Exit")
 
 
@@ -121,6 +122,19 @@ def action_compare_ml(state: Dict) -> None:
         return
 
     results = compare_ml_models(df_daily[pollutant])
+    print("\n=== ML Models Comparison ===")
+    for name, m in results.items():
+        print(f"{name}: MAE={m['MAE']:.3f}, RMSE={m['RMSE']:.3f}")
+
+def action_compare_ml_multivar(state: Dict) -> None:
+    _, df_daily = ensure_daily(state)
+
+    pollutant = input("Enter pollutant column for ML comparison: ").strip()
+    if pollutant not in df_daily.columns:
+        print("Column not found.")
+        return
+
+    results = compare_ml_models_multivar(df_daily, pollutant)
     print("\n=== ML Models Comparison ===")
     for name, m in results.items():
         print(f"{name}: MAE={m['MAE']:.3f}, RMSE={m['RMSE']:.3f}")

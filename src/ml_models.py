@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error
-
+from statsmodels.tsa.arima.model import ARIMA
 
 def build_supervised_features(
     series: pd.Series,
@@ -58,12 +58,17 @@ def compare_ml_models(series: pd.Series) -> Dict[str, Dict[str, float]]:
         "LinearRegression": LinearRegression(),
         "RandomForest": RandomForestRegressor(n_estimators=200, random_state=42),
         "GradientBoosting": GradientBoostingRegressor(random_state=42),
+        "ARIMA": ARIMA(X_train, order=(1, 1, 1))
     }
 
     results: Dict[str, Dict[str, float]] = {}
     for name, model in models.items():
-        model.fit(X_train, y_train)
-        pred = model.predict(X_test)
+        if name == "ARIMA":
+            model = model.fit()
+            pred = model.forecast(steps=len(X_test))
+        else:
+            model.fit(X_train, y_train)
+            pred = model.predict(X_test)
         mae = mean_absolute_error(y_test, pred)
         rmse = root_mean_squared_error(y_test, pred)
         results[name] = {"MAE": float(mae), "RMSE": float(rmse)}

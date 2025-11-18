@@ -49,3 +49,15 @@ def plot_corr_heatmap(df_daily: pd.DataFrame, cols: List[str]) -> None:
     plt.tight_layout()
     plt.show()
 
+def plot_history_and_forecast(
+    series: pd.Series,
+    forecast: pd.Series,
+    title: str,
+) -> None:
+    plt.figure(figsize=(10, 5))
+    plt.plot(series.index, series.values, label="History")
+    plt.plot(forecast.index, forecast.values, label="Forecast")
+    plt.title(title)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()

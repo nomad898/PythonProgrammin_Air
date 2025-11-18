@@ -4,6 +4,7 @@ from typing import Dict, Tuple
 import pandas as pd
 from arima_forecast import arima_forecast_with_backtest, plot_history_and_forecast, save_model_metrics
 from data_loading import get_daily_aggregates, load_raw
+from linear_regression_forecast import forecast_linear_regression, train_linear_regression
 from ml_models import compare_ml_models
 from eda import save_eda_summary
 from utils import get_default_paths
@@ -20,6 +21,7 @@ def print_menu() -> None:
     print("4 - Plot correlation heatmap")
     print("5 - ARIMA forecast with backtest")
     print("6 - Compare ML models on time series")
+    print("7 - Linear Regression forecast only")
     print("0 - Exit")
 
 
@@ -122,3 +124,24 @@ def action_compare_ml(state: Dict) -> None:
     print("\n=== ML Models Comparison ===")
     for name, m in results.items():
         print(f"{name}: MAE={m['MAE']:.3f}, RMSE={m['RMSE']:.3f}")
+
+
+def action_lr_forecast(state: Dict) -> None:
+    df_daily = ensure_daily(state)
+    pollutant = input("Enter pollutant column for Linear Regression forecast: ").strip()
+    if pollutant not in df_daily.columns:
+        print("Column not found.")
+        return
+
+    steps_str = input("Forecast horizon in days (default 30): ").strip()
+    try:
+        steps = int(steps_str)
+    except ValueError:
+        steps = 30
+
+    series = df_daily[pollutant]
+    model, metrics, _ = train_linear_regression(series)
+    print("Linear Regression metrics:", metrics)
+
+    forecast = forecast_linear_regression(series, model, steps=steps)
+    plot_history_and_forecast(series, forecast, title=f"LR forecast for {pollutant}")
